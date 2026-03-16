@@ -109,8 +109,14 @@ def strip_empty_in_list(list):
 
 
 def table_to_dict(table):
+    if not table:
+        return []
+
     tableHeader = table[0].split("  ")
     tableHeaderList = strip_empty_in_list(tableHeader)
+
+    if not tableHeaderList:
+        return []
 
     result = []
 
@@ -686,6 +692,15 @@ class ShowPartition(ShowCommand):
         self.command = "show part"
         self.start_key = "ID"
         self.show_noinit = ""
+
+    def detect_table_start_index(self, content):
+        for i in range(1, len(content)):
+            key = strip_empty_in_list(content[i].strip().split('  '))
+            if (key and key[0] in ('Index', 'ID') and
+                    'ID' in key and 'Name' in key):
+                return i
+
+        return -1
 
 
 class ShowSnapshot(ShowCommand):
